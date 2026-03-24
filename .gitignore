@@ -1,0 +1,8 @@
+# Security/Credentials
+.env
+credentials.json
+
+# Python caches and temp files
+__pycache__/
+temp_clip
+*.pyc

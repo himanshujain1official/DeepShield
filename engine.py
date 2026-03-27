@@ -1,12 +1,15 @@
 import os
+import streamlit as st
 import librosa
 import numpy as np
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part
-from dotenv import load_dotenv
+from google.oauth2 import service_account
 
-# 1. LOAD SECRET VARIABLES FROM .env FILE
-load_dotenv()
+# 1. READ SECRETS FROM STREAMLIT
+project_id = st.secrets["GCP_PROJECT_ID"]
+service_account_info = dict(st.secrets["gcp_service_account"])
+credentials_dict = dict(st.secrets["gcp_service_account"])
 
 # 2. FORCE PYTHON TO USE YOUR GCP KEY
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
@@ -14,12 +17,18 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
 # 3. INITIALIZE VERTEX AI SECURELY
 project_id = os.getenv("GCP_PROJECT_ID") 
 
-if not project_id:
-    raise ValueError("Missing GCP_PROJECT_ID in .env file!")
+# Convert service account dictionary to Credentials object
+# 2. CONVERT DICT TO GOOGLE CREDENTIALS OBJECT
+creds = service_account.Credentials.from_service_account_info(credentials_dict)
 
-vertexai.init(project=project_id, location="us-central1")
-model = GenerativeModel("gemini-2.5-flash")
+# 3. INITIALIZE
+vertexai.init(
+    project=project_id, 
+    location="us-central1", 
+    credentials=creds
+)
 
+model = GenerativeModel("gemini-1.5-flash-002")
 
 def analyze_voice_authenticity(audio_path):
     """

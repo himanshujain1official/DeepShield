@@ -1,1 +1,9 @@
-streamlit, plotly, librosa, google-cloud-aiplatform, numpy, pandas
+streamlit
+plotly
+librosa
+google-cloud-aiplatform
+numpy
+opencv-python
+pandas
+python-dotenv
+scipy

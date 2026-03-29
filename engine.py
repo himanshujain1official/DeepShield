@@ -5,30 +5,26 @@ import numpy as np
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part
 from google.oauth2 import service_account
+from dotenv import load_dotenv
 
-# 1. READ SECRETS FROM STREAMLIT
-project_id = st.secrets["GCP_PROJECT_ID"]
-service_account_info = dict(st.secrets["gcp_service_account"])
-credentials_dict = dict(st.secrets["gcp_service_account"])
-
-# 2. FORCE PYTHON TO USE YOUR GCP KEY
+# Load environment variables from .env file
+load_dotenv()
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+# 1. TRY LOCAL FIRST, THEN CLOUD
+if os.path.exists("credentials.json"):
+    # LOCAL MODE
+    load_dotenv()
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+    project_id = os.getenv("GCP_PROJECT_ID")
+    vertexai.init(project=project_id, location="us-central1")
+else:
+    # CLOUD MODE (Streamlit Secrets)
+    project_id = st.secrets["GCP_PROJECT_ID"]
+    credentials_dict = dict(st.secrets["gcp_service_account"])
+    creds = service_account.Credentials.from_service_account_info(credentials_dict)
+    vertexai.init(project=project_id, location="us-central1", credentials=creds)
 
-# 3. INITIALIZE VERTEX AI SECURELY
-project_id = os.getenv("GCP_PROJECT_ID") 
-
-# Convert service account dictionary to Credentials object
-# 2. CONVERT DICT TO GOOGLE CREDENTIALS OBJECT
-creds = service_account.Credentials.from_service_account_info(credentials_dict)
-
-# 3. INITIALIZE
-vertexai.init(
-    project=project_id, 
-    location="us-central1", 
-    credentials=creds
-)
-
-model = GenerativeModel("gemini-1.5-flash-002")
+model = GenerativeModel("gemini-2.5-flash")
 
 def analyze_voice_authenticity(audio_path):
     """
@@ -65,12 +61,29 @@ def analyze_voice_authenticity(audio_path):
 
 def analyze_video_sync(video_path):
     """
-    Analyzes video for lip-sync latency.
+    Analyzes video for lip-sync latency and deepfake artifacts.
     """
     try:
-        video_part = Part.from_data(data=open(video_path, "rb").read(), mime_type="video/mp4")
-        prompt = "Analyze this video for deepfake signs. Does the lip movement perfectly match the audio? Respond in one short sentence starting with either 'BIOMETRICS VERIFIED:' or 'HIGH RISK:'."
+        # Read the file data into memory
+        with open(video_path, "rb") as f:
+            video_data = f.read()
+            
+        video_part = Part.from_data(data=video_data, mime_type="video/mp4")
+        
+        prompt = """
+        Act as a Deepfake Forensic Specialist. Analyze this video for 'High-End Avatar' signatures:
+        1. Eye-Gaze: Does the person blink naturally? Is there a 'dead-eye' stare during speech?
+        2. Micro-expressions: Do the cheeks and forehead move naturally with the mouth?
+        3. Texture: Is the skin too smooth or 'plastic' under lighting changes?
+        
+        If you see ANY of these subtle AI signs, start your response with 'HIGH RISK:'. 
+        Only say 'BIOMETRICS VERIFIED:' if it is 100 percent indistinguishable from a biological human.
+        """
+        
         response = model.generate_content([prompt, video_part])
-        return response.text.strip()
+        return response.text.strip() # Returns ONLY a string
+
     except Exception as e:
-        return "SYSTEM ERROR: Could not process video.", "ERROR"
+        # This prints the real error to your VS Code terminal for debugging
+        print(f"DEBUG VIDEO ERROR: {e}")
+        return f"HIGH RISK: System could not verify biometric integrity. Error: {str(e)[:50]}"

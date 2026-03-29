@@ -3,7 +3,7 @@ plotly
 librosa
 google-cloud-aiplatform
 numpy
-opencv-python
+opencv-python-headless
 pandas
 python-dotenv
 scipy

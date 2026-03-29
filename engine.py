@@ -10,15 +10,17 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
-# 1. TRY LOCAL FIRST, THEN CLOUD
+# 1. SMART INITIALIZATION
 if os.path.exists("credentials.json"):
-    # LOCAL MODE
-    load_dotenv()
+    # MODE A: Local Development (Uses your physical file)
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+    # Note: Ensure you have your Project ID in a .env file locally
+    from dotenv import load_dotenv
+    load_dotenv()
     project_id = os.getenv("GCP_PROJECT_ID")
     vertexai.init(project=project_id, location="us-central1")
 else:
-    # CLOUD MODE (Streamlit Secrets)
+    # MODE B: Cloud Deployment (Uses Streamlit Secrets)
     project_id = st.secrets["GCP_PROJECT_ID"]
     credentials_dict = dict(st.secrets["gcp_service_account"])
     creds = service_account.Credentials.from_service_account_info(credentials_dict)

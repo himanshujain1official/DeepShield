@@ -1,10 +1,10 @@
-import cv2
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from engine import analyze_voice_authenticity, analyze_video_sync
 import time
 import pandas as pd
+import cv2
 
 # --- PAGE CONFIG (Forces Dark Mode) ---
 st.set_page_config(
@@ -136,12 +136,12 @@ with st.sidebar:
     st.info("Monitor live browser tabs with our specialized tool.")
 
 # This creates the interactive "Innovation" feature judges look for
+   # In the Sidebar
     st.download_button(
     label="📥 DOWNLOAD BROWSER EXTENSION",
-    data="DeepShield Extension Placeholder Content",
-    file_name="DeepShield_Extension_v1.zip",
-    mime="application/zip",
-    help="Install the Chrome Extension to protect Google Meet & Zoom calls in real-time."
+    data="This is a placeholder for the DeepShield Chrome Extension v1.0",
+    file_name="DeepShield_Extension.zip",
+    mime="application/zip"
 )
     st.markdown("<h2 style='text-align: center; color: #00f2ff;'><b>🛡️ SYSTEM CONTROL</b></h2>", unsafe_allow_html=True)
     st.divider()

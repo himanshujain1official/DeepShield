@@ -26,7 +26,7 @@ In 2026, Generative AI voice cloning has reached a point where traditional **"id
 ## ⚙️ The Architecture & Tech Stack
 * **Frontend/UI:** `Streamlit` with custom CSS & `Plotly` for 3D real-time spectral rendering.
 * **Signal Processing:** `Librosa` for extracting raw Mel-frequency cepstral coefficients (MFCCs) and spectral flatness.
-* **AI Neural Engine:** `Google Cloud Vertex AI` (Gemini 1.5 Flash) leveraging multimodal ingestion to analyze audio files for unnatural emotional cadence and breathing patterns.
+* **AI Neural Engine:** `Google Cloud Vertex AI` (Gemini 2.5 Flash) leveraging multimodal ingestion to analyze audio files for unnatural emotional cadence and breathing patterns.
 * **Backend:** Python 3.13.
 * **Deployment:** Streamlit Cloud & Google Cloud Platform.
 
@@ -62,4 +62,4 @@ pip install -r requirements.txt
 streamlit run app.py
 
 ## 📽️ Demo Video
-Watch the 3-minute technical walkthrough: []
+Watch the 3-minute technical walkthrough: https://youtube.com/shorts/68sWjFrcumk?si=nIdOnpH_CtQYHe7T
